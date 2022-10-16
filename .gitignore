@@ -1,0 +1,10 @@
+build/
+.vscode/
+resources/cut_bg_img/
+resources/tmp/
+resources/annotation_templates/out/
+resources/generated/*
+resources/generated_internodium_test_run/*
+resources/noveny_rekonstrukcios_test/*
+resources/YOLO/*
+resources/annotation_templates/annotations_tryout.xml
