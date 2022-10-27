@@ -11,7 +11,9 @@ protected:
 
     void SetUp() override
     {
-        p_table.reset(new TableD(5, 5));
+        p_table.reset(new TableD(5, 5,
+                                 {VarType::X, VarType::X, VarType::X, VarType::V},
+                                 {VarType::U, VarType::US, VarType::US}));
         p_table->at(0, 0) = 1;
         p_table->at(0, 1) = 2;
         p_table->at(0, 2) = 1;

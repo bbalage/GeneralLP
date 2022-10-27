@@ -1,5 +1,5 @@
 #include "Solver.hpp"
 
-void Solver::calcNextStageOne(TableD &table)
+void Solver::calcNextStageOne(const TableD &table)
 {
 }

@@ -15,7 +15,7 @@ public:
     Solver(Solver &&) = default;
     Solver &operator=(Solver &&) = default;
 
-    void calcNextStageOne(TableD &table);
+    void calcNextStageOne(const TableD &table);
 };
 
 #endif
