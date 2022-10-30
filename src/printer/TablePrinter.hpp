@@ -17,8 +17,21 @@ public:
 
     void printTable(const Table<T> &table)
     {
+        std::cout << "    ";
+        for (const auto &name : table.varNamesHor())
+        {
+            std::cout << name.string() << " ";
+        }
+        std::cout << " b\n";
+        const auto &varNamesVer = table.varNamesVer();
         for (size_t row = 0; row < table.rows(); ++row)
         {
+            if (row < varNamesVer.size())
+                std::cout << varNamesVer.at(row).string() << " ";
+            else if (row == varNamesVer.size())
+                std::cout << "-z ";
+            else
+                std::cout << "z* ";
             for (size_t col = 0; col < table.cols(); ++col)
             {
                 std::cout << table.at(row, col) << " ";
