@@ -26,6 +26,11 @@ struct VarName
     size_t num;
     VarType type;
 
+    bool operator==(const VarName &varName) const
+    {
+        return num == varName.num && type == varName.type;
+    }
+
     const std::map<VarType, std::string> &varTypeStr() const
     {
         static const std::map<VarType, std::string> s_varTypeStr{
@@ -55,8 +60,27 @@ public:
         loadVarNames(varTypesVer, false);
     }
 
-    Table(const Table &) = delete;
-    Table &operator=(const Table &) = delete;
+    Table(size_t rows,
+          size_t cols,
+          std::initializer_list<VarType> varTypesHor,
+          std::initializer_list<VarType> varTypesVer,
+          std::initializer_list<T> vals) : Table(rows, cols, varTypesHor, varTypesVer)
+    {
+        auto iter = vals.begin();
+        for (size_t row = 0; row < m_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                if (iter == vals.end())
+                    return;
+                m_table[row][col] = *iter;
+                ++iter;
+            }
+        }
+    }
+
+    Table(const Table &) = default;
+    Table &operator=(const Table &) = default;
     Table(Table &&) = default;
     Table &operator=(Table &&) = default;
 
@@ -112,7 +136,51 @@ public:
     const std::vector<VarPos> &usVer() const { return varsOfTypeVer(VarType::U); }
     const std::vector<VarPos> &ussVer() const { return varsOfTypeVer(VarType::US); }
 
+    bool operator==(const Table<T> &table) const
+    {
+        if (table.cols() != m_cols || table.rows() != m_rows)
+            return false;
+        if (table.varNamesVer().size() != m_varNamesVer.size() || table.varNamesHor().size() != m_varNamesHor.size())
+            return false;
+        for (size_t i = 0; i < m_varNamesHor.size(); ++i)
+        {
+            if (table.varNamesHor().at(i) != m_varNamesHor.at(i))
+                return false;
+        }
+        for (size_t i = 0; i < m_varNamesVer.size(); ++i)
+        {
+            if (table.varNamesVer().at(i) != m_varNamesVer.at(i))
+                return false;
+        }
+        for (size_t row = 0; row < m_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                if (table.at(row, col) != m_table[row][col])
+                    return false;
+            }
+        }
+        return true;
+    }
+
     size_t bColIndex() const { return m_cols - 1; }
+    /**
+     * Swaps horizontal variable name on col with vertical variable name on row.
+     *
+     * Throws std::invalid_argument if row and col exceed the number of stored
+     * variable names on either axis.
+     *
+     * @param row
+     * @param col
+     */
+    void swapVarNames(size_t row, size_t col)
+    {
+        if (row >= m_varNamesHor.size() || col >= m_varNamesVer.size())
+            throw std::invalid_argument("Cannot switch given variable names.");
+        auto varNameTmp = m_varNamesHor[col];
+        m_varNamesHor[col] = m_varNamesVer[row];
+        m_varNamesVer[row] = varNameTmp;
+    }
 
 private:
     size_t m_rows;

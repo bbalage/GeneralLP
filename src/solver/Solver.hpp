@@ -15,7 +15,8 @@ public:
     Solver(Solver &&) = default;
     Solver &operator=(Solver &&) = default;
 
-    void calcNextStageOne(const TableD &table);
+    TableD calcNextStageOne(const TableD &table);
+    std::pair<size_t, size_t> findUSSPivotElement(const TableD &table) const;
 };
 
 #endif

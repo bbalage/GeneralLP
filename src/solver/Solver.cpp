@@ -1,8 +1,18 @@
 #include "Solver.hpp"
 #include <limits>
 #include <iostream>
+#include "../util/exception.hpp"
+#include "../util/calc.hpp"
 
-void Solver::calcNextStageOne(const TableD &table)
+TableD Solver::calcNextStageOne(const TableD &table)
+{
+    auto [pivotRow, pivotCol] = findUSSPivotElement(table);
+    TableD pivotedTable = glp::pivot(table, pivotRow, pivotCol);
+    pivotedTable.swapVarNames(pivotRow, pivotCol);
+    return pivotedTable;
+}
+
+std::pair<size_t, size_t> Solver::findUSSPivotElement(const TableD &table) const
 {
     // Find pivot element
     const auto &uss = table.varsOfTypeVer(VarType::US);
@@ -30,11 +40,7 @@ void Solver::calcNextStageOne(const TableD &table)
             }
         }
     }
-    std::cout
-        << "Pivot element is: ("
-        << std::to_string(pivotRow)
-        << ", "
-        << std::to_string(pivotCol)
-        << ")"
-        << std::endl;
+    if (!pivotFound)
+        throw LPException(std::string("No pivot element could be found."));
+    return std::make_pair(pivotRow, pivotCol);
 }
