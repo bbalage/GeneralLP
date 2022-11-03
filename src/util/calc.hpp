@@ -11,9 +11,10 @@ namespace glp
     {
         static_assert(std::is_arithmetic<T>::value);
         if (pivotRow >= table.rows() || pivotCol >= table.cols())
-        {
             throw std::invalid_argument("Pivot element is not in table. Invalid pivotRow or pivotCol.");
-        }
+        if (table.at(pivotRow, pivotCol) == 0)
+            throw std::invalid_argument("Pivot element cannot be zero!");
+
         Table<T> new_table = table;
 
         // 1. Set the pivot element to 1 / pivot element.

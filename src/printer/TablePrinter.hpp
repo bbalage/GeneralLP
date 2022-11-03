@@ -18,12 +18,12 @@ public:
     void printTable(const Table<T> &table)
     {
         std::cout << "    ";
-        for (const auto &name : table.varNamesHor())
+        for (const auto &name : table.varNamesCol())
         {
             std::cout << name.string() << " ";
         }
         std::cout << " b\n";
-        const auto &varNamesVer = table.varNamesVer();
+        const auto &varNamesVer = table.varNamesRow();
         for (size_t row = 0; row < table.rows(); ++row)
         {
             if (row < varNamesVer.size())

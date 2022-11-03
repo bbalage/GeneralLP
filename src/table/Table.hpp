@@ -18,7 +18,7 @@ enum struct VarType
 struct VarPos
 {
     size_t index;
-    bool hor;
+    bool isCol;
 };
 
 struct VarName
@@ -50,21 +50,18 @@ class Table
 public:
     Table(size_t rows,
           size_t cols,
-          std::initializer_list<VarType> varTypesHor,
-          std::initializer_list<VarType> varTypesVer) : m_rows(rows),
-                                                        m_cols(cols)
+          std::initializer_list<VarName> varNamesCol,
+          std::initializer_list<VarName> varNamesRow) : m_rows{rows}, m_cols{cols}, m_varNamesCol{varNamesCol}, m_varNamesRow{varNamesRow}
     {
         std::vector<T> v(cols, 0.0);
         m_table.resize(rows, v);
-        loadVarNames(varTypesHor, true);
-        loadVarNames(varTypesVer, false);
     }
 
     Table(size_t rows,
           size_t cols,
-          std::initializer_list<VarType> varTypesHor,
-          std::initializer_list<VarType> varTypesVer,
-          std::initializer_list<T> vals) : Table(rows, cols, varTypesHor, varTypesVer)
+          std::initializer_list<VarName> varNamesCol,
+          std::initializer_list<VarName> varNamesRow,
+          std::initializer_list<T> vals) : Table(rows, cols, varNamesCol, varNamesRow)
     {
         auto iter = vals.begin();
         for (size_t row = 0; row < m_rows; ++row)
@@ -89,10 +86,10 @@ public:
     size_t rows() const { return m_rows; }
     size_t cols() const { return m_cols; }
 
-    std::vector<size_t> varsOfType(VarType type, bool hor) const
+    std::vector<size_t> varsOfType(VarType type, bool isCol) const
     {
         std::vector<size_t> indices;
-        const auto &vars = hor ? m_varNamesHor : m_varNamesVer;
+        const auto &vars = isCol ? m_varNamesCol : m_varNamesRow;
         for (size_t i = 0; i < vars.size(); ++i)
         {
             if (vars[i].type == type)
@@ -101,55 +98,55 @@ public:
         return indices;
     }
 
-    std::vector<size_t> varsOfTypeHor(VarType type) const
+    std::vector<size_t> varsOfTypeCol(VarType type) const
     {
         return varsOfType(type, true);
     }
 
-    std::vector<size_t> varsOfTypeVer(VarType type) const
+    std::vector<size_t> varsOfTypeRow(VarType type) const
     {
         return varsOfType(type, false);
     }
 
-    std::vector<VarName> &varNamesHor() { return m_varNamesHor; }
-    const std::vector<VarName> &varNamesHor() const { return m_varNamesHor; }
-    std::vector<VarName> &varNamesVer() { return m_varNamesVer; }
-    const std::vector<VarName> &varNamesVer() const { return m_varNamesVer; }
+    std::vector<VarName> &varNamesCol() { return m_varNamesCol; }
+    const std::vector<VarName> &varNamesCol() const { return m_varNamesCol; }
+    std::vector<VarName> &varNamesRow() { return m_varNamesRow; }
+    const std::vector<VarName> &varNamesRow() const { return m_varNamesRow; }
 
-    VarType varTypeAtRow(size_t i) const { return m_varNamesVer[i].type; }
-    VarType varTypeAtCol(size_t i) const { return m_varNamesHor[i].type; }
+    VarType varTypeAtRow(size_t i) const { return m_varNamesRow[i].type; }
+    VarType varTypeAtCol(size_t i) const { return m_varNamesCol[i].type; }
 
-    std::vector<VarPos> &xsHor() { return varsOfTypeHor(VarType::X); }
-    std::vector<VarPos> &vsHor() { return varsOfTypeHor(VarType::V); }
-    std::vector<VarPos> &usHor() { return varsOfTypeHor(VarType::U); }
-    std::vector<VarPos> &ussHor() { return varsOfTypeHor(VarType::US); }
-    std::vector<VarPos> &xsVer() { return varsOfTypeVer(VarType::X); }
-    std::vector<VarPos> &vsVer() { return varsOfTypeVer(VarType::V); }
-    std::vector<VarPos> &usVer() { return varsOfTypeVer(VarType::U); }
-    std::vector<VarPos> &ussVer() { return varsOfTypeVer(VarType::US); }
-    const std::vector<VarPos> &xsHor() const { return varsOfTypeHor(VarType::X); }
-    const std::vector<VarPos> &vsHor() const { return varsOfTypeHor(VarType::V); }
-    const std::vector<VarPos> &usHor() const { return varsOfTypeHor(VarType::U); }
-    const std::vector<VarPos> &ussHor() const { return varsOfTypeHor(VarType::US); }
-    const std::vector<VarPos> &xsVer() const { return varsOfTypeVer(VarType::X); }
-    const std::vector<VarPos> &vsVer() const { return varsOfTypeVer(VarType::V); }
-    const std::vector<VarPos> &usVer() const { return varsOfTypeVer(VarType::U); }
-    const std::vector<VarPos> &ussVer() const { return varsOfTypeVer(VarType::US); }
+    std::vector<VarPos> &xsCol() { return varsOfTypeCol(VarType::X); }
+    std::vector<VarPos> &vsCol() { return varsOfTypeCol(VarType::V); }
+    std::vector<VarPos> &usCol() { return varsOfTypeCol(VarType::U); }
+    std::vector<VarPos> &ussCol() { return varsOfTypeCol(VarType::US); }
+    std::vector<VarPos> &xsRow() { return varsOfTypeRow(VarType::X); }
+    std::vector<VarPos> &vsRow() { return varsOfTypeRow(VarType::V); }
+    std::vector<VarPos> &usRow() { return varsOfTypeRow(VarType::U); }
+    std::vector<VarPos> &ussRow() { return varsOfTypeRow(VarType::US); }
+    const std::vector<VarPos> &xsCol() const { return varsOfTypeCol(VarType::X); }
+    const std::vector<VarPos> &vsCol() const { return varsOfTypeCol(VarType::V); }
+    const std::vector<VarPos> &usCol() const { return varsOfTypeCol(VarType::U); }
+    const std::vector<VarPos> &ussCol() const { return varsOfTypeCol(VarType::US); }
+    const std::vector<VarPos> &xsRow() const { return varsOfTypeRow(VarType::X); }
+    const std::vector<VarPos> &vsRow() const { return varsOfTypeRow(VarType::V); }
+    const std::vector<VarPos> &usRow() const { return varsOfTypeRow(VarType::U); }
+    const std::vector<VarPos> &ussRow() const { return varsOfTypeRow(VarType::US); }
 
     bool operator==(const Table<T> &table) const
     {
         if (table.cols() != m_cols || table.rows() != m_rows)
             return false;
-        if (table.varNamesVer().size() != m_varNamesVer.size() || table.varNamesHor().size() != m_varNamesHor.size())
+        if (table.varNamesRow().size() != m_varNamesRow.size() || table.varNamesCol().size() != m_varNamesCol.size())
             return false;
-        for (size_t i = 0; i < m_varNamesHor.size(); ++i)
+        for (size_t i = 0; i < m_varNamesCol.size(); ++i)
         {
-            if (table.varNamesHor().at(i) != m_varNamesHor.at(i))
+            if (table.varNamesCol().at(i) != m_varNamesCol.at(i))
                 return false;
         }
-        for (size_t i = 0; i < m_varNamesVer.size(); ++i)
+        for (size_t i = 0; i < m_varNamesRow.size(); ++i)
         {
-            if (table.varNamesVer().at(i) != m_varNamesVer.at(i))
+            if (table.varNamesRow().at(i) != m_varNamesRow.at(i))
                 return false;
         }
         for (size_t row = 0; row < m_rows; ++row)
@@ -175,33 +172,19 @@ public:
      */
     void swapVarNames(size_t row, size_t col)
     {
-        if (row >= m_varNamesHor.size() || col >= m_varNamesVer.size())
+        if (row >= m_varNamesRow.size() || col >= m_varNamesCol.size())
             throw std::invalid_argument("Cannot switch given variable names.");
-        auto varNameTmp = m_varNamesHor[col];
-        m_varNamesHor[col] = m_varNamesVer[row];
-        m_varNamesVer[row] = varNameTmp;
+        auto varNameTmp = m_varNamesCol[col];
+        m_varNamesCol[col] = m_varNamesRow[row];
+        m_varNamesRow[row] = varNameTmp;
     }
 
 private:
     size_t m_rows;
     size_t m_cols;
     std::vector<std::vector<T>> m_table;
-    std::vector<VarName> m_varNamesHor;
-    std::vector<VarName> m_varNamesVer;
-
-    void loadVarNames(std::initializer_list<VarType> types, bool hor)
-    {
-        std::map<VarType, uint> counts = {
-            {VarType::X, 0},
-            {VarType::V, 0},
-            {VarType::U, 0},
-            {VarType::US, 0}};
-        auto &varNames = hor ? m_varNamesHor : m_varNamesVer;
-        for (auto type : types)
-        {
-            varNames.push_back(VarName{counts.at(type)++, type});
-        }
-    }
+    std::vector<VarName> m_varNamesCol;
+    std::vector<VarName> m_varNamesRow;
 };
 
 #endif

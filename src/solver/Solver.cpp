@@ -4,7 +4,7 @@
 #include "../util/exception.hpp"
 #include "../util/calc.hpp"
 
-TableD Solver::calcNextStageOne(const TableD &table)
+TableD Solver::calcNext_StageOne(const TableD &table)
 {
     auto [pivotRow, pivotCol] = findUSSPivotElement(table);
     TableD pivotedTable = glp::pivot(table, pivotRow, pivotCol);
@@ -15,13 +15,15 @@ TableD Solver::calcNextStageOne(const TableD &table)
 std::pair<size_t, size_t> Solver::findUSSPivotElement(const TableD &table) const
 {
     // Find pivot element
-    const auto &uss = table.varsOfTypeVer(VarType::US);
+    const auto &uss = table.varsOfTypeRow(VarType::US);
     size_t pivotRow = 0;
     size_t pivotCol = 0;
     bool pivotFound = false;
     for (size_t col = 0; col < table.bColIndex() && !pivotFound; ++col)
     {
         if (table.varTypeAtCol(col) == VarType::US)
+            continue;
+        if (table.at(table.rows() - 1, col) < 0)
             continue;
         double min = std::numeric_limits<double>::max();
         for (const auto &row : uss)
