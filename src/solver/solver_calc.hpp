@@ -26,7 +26,7 @@ namespace glp
         {
             if (table.varTypeAtCol(col) == VarType::US)
                 continue;
-            if (table.at(table.rows() - 1, col) < 0)
+            if (table.at(table.rows() - 1, col) <= T(0))
                 continue;
             T min = table.max_possible_value();
             for (const auto &row : uss)
@@ -86,6 +86,30 @@ namespace glp
         Table<T> pivotedTable = glp::pivot(table, pivotRow, pivotCol);
         pivotedTable.swapVarNames(pivotRow, pivotCol);
         return pivotedTable;
+    }
+
+    template <class T>
+    Table<T> firstStageTableToSecondStageTable(const Table<T> &in_table)
+    {
+        Table<T> table = in_table;
+
+        // 1. Remove the z* row
+        table.removeRow(table.rows() - 1);
+
+        // 2. Check if there is at least one u* row remained, and throw an exception if it has.
+        const std::vector<size_t> &ussVarRows = table.varsOfTypeRow(VarType::US);
+        if (ussVarRows.size() != 0)
+            throw LPException(
+                std::string("Some unexpected error occurred. Variable is u* at row ") + std::to_string(ussVarRows[0]));
+
+        // 3. Remove u* cols.
+        const std::vector<size_t> &ussVarCols = table.varsOfTypeCol(VarType::US);
+        for (size_t i = 0; i < ussVarCols.size(); ++i)
+        {
+            table.removeCol(ussVarCols[i] - i);
+        }
+
+        return table;
     }
 }
 #endif

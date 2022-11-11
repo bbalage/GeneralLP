@@ -16,6 +16,8 @@ public:
     TablePrinter &operator=(TablePrinter &&) = default;
 
     virtual void printTable(const Table<T> &table) = 0;
+    virtual void printNoSecondaryOptimum() = 0;
+    virtual void printFirstToSecondStageTransfer() = 0;
 };
 
 template <class T>
@@ -24,7 +26,7 @@ class TablePrinterTextStream : public TablePrinter<T>
 public:
     TablePrinterTextStream(std::ostream &out_stream) : m_out_stream{out_stream} {}
 
-    virtual void printTable(const Table<T> &table) override
+    void printTable(const Table<T> &table) override
     {
         m_out_stream << "    ";
         for (const auto &name : table.varNamesCol())
@@ -47,6 +49,20 @@ public:
             }
             m_out_stream << "\n";
         }
+    }
+
+    void printNoSecondaryOptimum() override
+    {
+        m_out_stream << "\n";
+        m_out_stream << "No secondary optimum was found.\n";
+        m_out_stream << "The task is not solveable given the provided constraints.";
+    }
+
+    void printFirstToSecondStageTransfer() override
+    {
+        m_out_stream << "First stage is finished.\n";
+        m_out_stream << "Removing unnecessary rows and columns from table.\n";
+        m_out_stream << "Starting second stage.\n";
     }
 
 private:

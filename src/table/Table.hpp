@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "../util/exception.hpp"
 
 // Variable type for the row or column marker.
 enum struct VarType
@@ -55,6 +56,7 @@ public:
     {
         static_assert(std::is_floating_point_v<T>);
         // TODO: std::is_same_v<T, Fraction>
+        static_assert(std::is_move_assignable_v<T>);
         std::vector<T> v(cols, 0.0);
         m_table.resize(rows, v);
     }
@@ -181,9 +183,61 @@ public:
         m_varNamesRow[row] = varNameTmp;
     }
 
+    void removeRow(size_t in_row)
+    {
+        bool isInFirstStage = rows() - 2 == m_varNamesRow.size();
+        if ((isInFirstStage && in_row == rows() - 2) || (!isInFirstStage && in_row == rows() - 1))
+            throw LPException("Cannot remove z (value) row.");
+
+        // 1. Resize table.
+        for (size_t row = in_row; row < rows() - 1; ++row)
+        {
+            m_table[row] = std::move(m_table[row + 1]);
+        }
+        m_table.resize(rows() - 1);
+        --m_rows;
+
+        // 2. If it was the last row (z*), which was removed, then return without modifying variable names.
+        if (isInFirstStage && in_row == rows())
+            return;
+
+        // 3. Resize var name list.
+        for (size_t row = in_row; row < m_varNamesRow.size() - 1; ++row)
+        {
+            m_varNamesRow[row] = m_varNamesRow[row + 1];
+        }
+        m_varNamesRow.resize(m_varNamesRow.size() - 1);
+    }
+
+    void removeCol(size_t in_col)
+    {
+        if (in_col == cols() - 1)
+            throw LPException("Cannot remove b (restriction) column.");
+
+        // 1. Resize table.
+        for (size_t row = 0; row < rows(); ++row)
+        {
+            for (size_t col = in_col; col < cols() - 1; ++col)
+            {
+                at(row, col) = std::move(at(row, col + 1));
+            }
+            m_table[row].resize(cols() - 1);
+        }
+        --m_cols;
+
+        // 2. Resize var name list.
+        for (size_t col = in_col; col < m_varNamesCol.size() - 1; ++col)
+        {
+            m_varNamesCol[col] = m_varNamesCol[col + 1];
+        }
+        m_varNamesCol.resize(m_varNamesCol.size() - 1);
+    }
+
     constexpr T max_possible_value() const
     {
-        static_assert(std::is_arithmetic_v<T>, "type is not arithmetic nor there is a specialization for the template");
+        static_assert(
+            std::is_arithmetic_v<T>,
+            "type is not arithmetic nor there is a specialization for the template type");
         return std::numeric_limits<T>::max();
     }
 

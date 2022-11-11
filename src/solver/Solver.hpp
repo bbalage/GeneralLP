@@ -26,6 +26,7 @@ public:
 
     void solveGLPTask(const Table<T> &in_table, TablePrinter<T> &tablePrinter) override
     {
+        // 1. Solve stage one
         Table<T> table = in_table;
         while (!glp::isSecondaryOptimumFound(table))
         {
@@ -33,10 +34,15 @@ public:
             table = glp::calcNext_StageOne(table);
         }
         tablePrinter.printTable(table);
-        // if (glp::getSecondaryOptimum() != 0)
-        // {
-        //     tablePrinter.noSecondaryOptimum();
-        // }
+        if (glp::getSecondaryOptimum(table) != T(0))
+        {
+            tablePrinter.printNoSecondaryOptimum();
+        }
+
+        // 2. Remove unnecessary data from table.
+        table = glp::firstStageTableToSecondStageTable(table);
+        tablePrinter.printFirstToSecondStageTransfer();
+        tablePrinter.printTable(table);
     }
 };
 
