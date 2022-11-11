@@ -53,6 +53,8 @@ public:
           std::initializer_list<VarName> varNamesCol,
           std::initializer_list<VarName> varNamesRow) : m_rows{rows}, m_cols{cols}, m_varNamesCol{varNamesCol}, m_varNamesRow{varNamesRow}
     {
+        static_assert(std::is_floating_point_v<T>);
+        // TODO: std::is_same_v<T, Fraction>
         std::vector<T> v(cols, 0.0);
         m_table.resize(rows, v);
     }
@@ -179,6 +181,12 @@ public:
         m_varNamesRow[row] = varNameTmp;
     }
 
+    constexpr T max_possible_value() const
+    {
+        static_assert(std::is_arithmetic_v<T>, "type is not arithmetic nor there is a specialization for the template");
+        return std::numeric_limits<T>::max();
+    }
+
 private:
     size_t m_rows;
     size_t m_cols;
@@ -186,5 +194,8 @@ private:
     std::vector<VarName> m_varNamesCol;
     std::vector<VarName> m_varNamesRow;
 };
+
+typedef Table<double> TableD;
+typedef Table<float> TableF;
 
 #endif

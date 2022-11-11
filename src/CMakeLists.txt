@@ -8,6 +8,7 @@ list(FILTER LIB_SOURCES EXCLUDE REGEX ".*main.cpp$")
 set(LIB_NAME ${CMAKE_PROJECT_NAME}_lib)
 
 add_library(${LIB_NAME} STATIC ${LIB_SOURCES} )
+set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 set(MAIN_EXECUTABLE_NAME ${CMAKE_PROJECT_NAME})
 add_executable(${MAIN_EXECUTABLE_NAME} "main.cpp")

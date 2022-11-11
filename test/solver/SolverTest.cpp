@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "../../src/solver/Solver.hpp"
+#include "../../src/solver/solver_calc.hpp"
 #include "../../src/printer/TablePrinter.hpp"
 
 class SolverTest : public ::testing::Test
@@ -26,8 +26,7 @@ public:
 
 TEST_F(SolverTest, FirstStepTest_Table1)
 {
-    Solver solver;
-    TablePrinter<double> printer; // TODO: Remove! Only debug code!
+    TablePrinterTextStream<double> printer(std::cout); // TODO: Remove! Only debug code!
     TableD table(5, 5,
                  {VarName{0, VarType::X}, VarName{1, VarType::X}, VarName{2, VarType::X}, VarName{2, VarType::V}},
                  {VarName{0, VarType::U}, VarName{1, VarType::US}, VarName{2, VarType::US}},
@@ -39,7 +38,7 @@ TEST_F(SolverTest, FirstStepTest_Table1)
 
     std::cout << "Before: " << std::endl; // TODO: Remove! Only debug code!
     printer.printTable(table);            // TODO: Remove! Only debug code!
-    auto actualTable = solver.calcNext_StageOne(table);
+    auto actualTable = glp::calcNext_StageOne(table);
     std::cout << "After: " << std::endl; // TODO: Remove! Only debug code!
     printer.printTable(actualTable);     // TODO: Remove! Only debug code!
 
@@ -48,8 +47,7 @@ TEST_F(SolverTest, FirstStepTest_Table1)
 
 TEST_F(SolverTest, SecondStepTest_Table1)
 {
-    Solver solver;
-    TablePrinter<double> printer; // TODO: Remove! Only debug code!
+    TablePrinterTextStream<double> printer(std::cout); // TODO: Remove! Only debug code!
     TableD table(5, 5,
                  {VarName{2, VarType::US}, VarName{1, VarType::X}, VarName{2, VarType::X}, VarName{2, VarType::V}},
                  {VarName{0, VarType::U}, VarName{1, VarType::US}, VarName{0, VarType::X}},
@@ -63,7 +61,7 @@ TEST_F(SolverTest, SecondStepTest_Table1)
     printer.printTable(expectedTable);      // TODO: Remove! Only debug code!
     std::cout << "Before: " << std::endl;   // TODO: Remove! Only debug code!
     printer.printTable(table);              // TODO: Remove! Only debug code!
-    auto actualTable = solver.calcNext_StageOne(table);
+    auto actualTable = glp::calcNext_StageOne(table);
     std::cout << "After: " << std::endl; // TODO: Remove! Only debug code!
     printer.printTable(actualTable);     // TODO: Remove! Only debug code!
 
@@ -72,8 +70,7 @@ TEST_F(SolverTest, SecondStepTest_Table1)
 
 TEST_F(SolverTest, FirstStepTest_Table2)
 {
-    Solver solver;
-    TablePrinter<double> printer; // TODO: Remove! Only debug code!
+    TablePrinterTextStream<double> printer(std::cout); // TODO: Remove! Only debug code!
     TableD table(5, 4,
                  {VarName{0, VarType::X}, VarName{1, VarType::X}, VarName{0, VarType::V}},
                  {VarName{0, VarType::US}, VarName{1, VarType::U}, VarName{2, VarType::U}},
@@ -83,7 +80,7 @@ TEST_F(SolverTest, FirstStepTest_Table2)
 
     std::cout << "Before: " << std::endl; // TODO: Remove! Only debug code!
     printer.printTable(table);            // TODO: Remove! Only debug code!
-    auto resultTable = solver.calcNext_StageOne(table);
+    auto resultTable = glp::calcNext_StageOne(table);
     VarName actualVarName_Row1 = resultTable.varNamesRow()[0];
     VarName actualVarName_Col1 = resultTable.varNamesCol()[0];
     std::cout << "After: " << std::endl; // TODO: Remove! Only debug code!
@@ -91,4 +88,25 @@ TEST_F(SolverTest, FirstStepTest_Table2)
 
     ASSERT_EQ(expectedVarName_Row1, actualVarName_Row1);
     ASSERT_EQ(expectedVarName_Col1, actualVarName_Col1);
+}
+
+TEST_F(SolverTest, FirstStepTest_Table1_Float)
+{
+    TablePrinterTextStream<float> printer(std::cout); // TODO: Remove! Only debug code!
+    TableF table(5, 5,
+                 {VarName{0, VarType::X}, VarName{1, VarType::X}, VarName{2, VarType::X}, VarName{2, VarType::V}},
+                 {VarName{0, VarType::U}, VarName{1, VarType::US}, VarName{2, VarType::US}},
+                 {1, 2, 1, 0, 50, 1, 1, 0, 0, 40, 1, 1, 2, -1, 20, 5, -2, 8, 0, 0, 2, 2, 2, -1, 60});
+    TableF expectedTable(5, 5,
+                         {VarName{2, VarType::US}, VarName{1, VarType::X}, VarName{2, VarType::X}, VarName{2, VarType::V}},
+                         {VarName{0, VarType::U}, VarName{1, VarType::US}, VarName{0, VarType::X}},
+                         {-1, 1, -1, 1, 30, -1, 0, -2, 1, 20, 1, 1, 2, -1, 20, -5, -7, -2, 5, -100, -2, 0, -2, 1, 20});
+
+    std::cout << "Before: " << std::endl; // TODO: Remove! Only debug code!
+    printer.printTable(table);            // TODO: Remove! Only debug code!
+    auto actualTable = glp::calcNext_StageOne(table);
+    std::cout << "After: " << std::endl; // TODO: Remove! Only debug code!
+    printer.printTable(actualTable);     // TODO: Remove! Only debug code!
+
+    ASSERT_EQ(expectedTable, actualTable);
 }
