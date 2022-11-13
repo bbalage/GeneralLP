@@ -13,10 +13,11 @@ int main()
     std::unique_ptr<Solver<double>> solver(new SolverSimple<double>);
     std::unique_ptr<TableCreator<double>> tableCreator(new TableCreatorText<double>);
 
-    std::string filePath("/home/bbalage/ForUniversity/Bead/MSc-II/numanal/GeneralLP/resources/table1.txt");
+    // std::string filePath("/home/bbalage/ForUniversity/Bead/MSc-II/numanal/GeneralLP/resources/table1.txt");
+    std::string filePath("/home/bbalage/For_University/Bead/GeneralLP/resources/table1.txt");
     std::string descriptor = glp::fileContentAsString(filePath);
     // TODO: Write parser
-    // Table<double> table = tableCreator->createTable(descriptor);
+    Table<double> table = tableCreator->createTable(descriptor);
 
     // solver->solveGLPTask(table, *tablePrinter);
     std::cout << "Done.";

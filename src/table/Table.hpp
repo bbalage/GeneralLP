@@ -13,7 +13,8 @@ enum struct VarType
     X,
     V,
     U,
-    US
+    US,
+    OTHER
 };
 
 struct VarPos
@@ -49,6 +50,18 @@ template <class T>
 class Table
 {
 public:
+    Table(size_t rows,
+          size_t cols,
+          std::vector<VarName> varNamesCol,
+          std::vector<VarName> varNamesRow,
+          std::vector<std::vector<T>> tableValues) : m_rows{rows},
+                                                     m_cols{cols},
+                                                     m_varNamesCol{varNamesCol},
+                                                     m_varNamesRow{varNamesRow},
+                                                     m_table{tableValues}
+    {
+    }
+
     Table(size_t rows,
           size_t cols,
           std::initializer_list<VarName> varNamesCol,
@@ -244,9 +257,9 @@ public:
 private:
     size_t m_rows;
     size_t m_cols;
-    std::vector<std::vector<T>> m_table;
     std::vector<VarName> m_varNamesCol;
     std::vector<VarName> m_varNamesRow;
+    std::vector<std::vector<T>> m_table;
 };
 
 typedef Table<double> TableD;
