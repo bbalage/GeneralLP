@@ -18,6 +18,7 @@ public:
     virtual void printTable(const Table<T> &table) = 0;
     virtual void printNoSecondaryOptimum() = 0;
     virtual void printFirstToSecondStageTransfer() = 0;
+    virtual void printPrimaryOptimumData(const Table<T> &table) = 0;
 };
 
 template <class T>
@@ -63,6 +64,11 @@ public:
         m_out_stream << "First stage is finished.\n";
         m_out_stream << "Removing unnecessary rows and columns from table.\n";
         m_out_stream << "Starting second stage.\n";
+    }
+
+    virtual void printPrimaryOptimumData(const Table<T> &table)
+    {
+        m_out_stream << table.at(table.rows() - 1, table.cols() - 1) << std::endl;
     }
 
 private:

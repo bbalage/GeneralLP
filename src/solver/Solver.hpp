@@ -43,6 +43,15 @@ public:
         table = glp::firstStageTableToSecondStageTable(table);
         tablePrinter.printFirstToSecondStageTransfer();
         tablePrinter.printTable(table);
+
+        // 3. Solve stage two
+        while (!glp::isPrimaryOptimumFound(table))
+        {
+            tablePrinter.printTable(table);
+            table = glp::calcNext_StageTwo(table);
+        }
+        tablePrinter.printTable(table);
+        // tablePrinter.printPrimaryOptimumData(table);
     }
 };
 

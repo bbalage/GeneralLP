@@ -18,20 +18,20 @@ namespace glp
     template <class T>
     std::pair<size_t, size_t> findPivotElement_StageOne(const Table<T> &table)
     {
-        const auto &uss = table.varsOfTypeRow(VarType::US);
         size_t pivotRow = 0;
         size_t pivotCol = 0;
         bool pivotFound = false;
         for (size_t col = 0; col < table.bColIndex() && !pivotFound; ++col)
         {
+            pivotFound = false;
             if (table.varTypeAtCol(col) == VarType::US)
                 continue;
             if (table.at(table.rows() - 1, col) <= T(0))
                 continue;
             T min = table.max_possible_value();
-            for (const auto &row : uss)
+            for (size_t row = 0; row < table.varNamesRow().size(); ++row)
             {
-                if (table.at(row, col) == T(0))
+                if (table.at(row, col) <= T(0))
                 {
                     continue;
                 }
@@ -44,6 +44,8 @@ namespace glp
                     pivotFound = true;
                 }
             }
+            if (table.varTypeAtRow(pivotRow) != VarType::US)
+                pivotFound = false;
         }
         if (!pivotFound)
             throw LPException(std::string("No pivot element could be found."));
@@ -58,7 +60,7 @@ namespace glp
     template <class T>
     bool isSecondaryOptimumFound(const Table<T> &table)
     {
-        for (size_t col = 0; col < table.cols(); ++col)
+        for (size_t col = 0; col < table.cols() - 1; ++col)
         {
             if (table.at(table.rows() - 1, col) > T(0))
             {
@@ -110,6 +112,82 @@ namespace glp
         }
 
         return table;
+    }
+
+    /**
+     * @brief Checks whether the primary optimum value is already found.
+     *
+     * @param table A table in the second stage.
+     */
+    template <class T>
+    bool isPrimaryOptimumFound(const Table<T> &table)
+    {
+        for (size_t col = 0; col < table.cols() - 1; ++col)
+        {
+            if (table.at(table.rows() - 1, col) > T(0))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Get the Primary Optimum object.
+     *
+     * @param table a table in the second stage
+     */
+    template <class T>
+    T getPrimaryOptimum(const Table<T> &table)
+    {
+        return table.at(table.rows() - 1, table.cols() - 1);
+    }
+
+    /**
+     * @brief Find pivot element in table.
+     *
+     * @param table a table in the second stage
+     * @return std::pair where pair.first is the row of the pivot element and pair.second is the col.
+     */
+    template <class T>
+    std::pair<size_t, size_t> findPivotElement_StageTwo(const Table<T> &table)
+    {
+        size_t pivotRow = 0;
+        size_t pivotCol = 0;
+        bool pivotFound = false;
+        for (size_t col = 0; col < table.bColIndex() && !pivotFound; ++col)
+        {
+            if (table.at(table.rows() - 1, col) <= T(0))
+                continue;
+            T min = table.max_possible_value();
+            for (size_t row = 0; row < table.varNamesRow().size(); ++row)
+            {
+                if (table.at(row, col) <= T(0))
+                {
+                    continue;
+                }
+                T val = table.at(row, table.bColIndex()) / table.at(row, col);
+                if (val < min)
+                {
+                    min = val;
+                    pivotRow = row;
+                    pivotCol = col;
+                    pivotFound = true;
+                }
+            }
+        }
+        if (!pivotFound)
+            throw LPException(std::string("No pivot element could be found."));
+        return std::make_pair(pivotRow, pivotCol);
+    }
+
+    template <class T>
+    Table<T> calcNext_StageTwo(const Table<T> &table)
+    {
+        auto [pivotRow, pivotCol] = findPivotElement_StageTwo(table);
+        Table<T> pivotedTable = glp::pivot(table, pivotRow, pivotCol);
+        pivotedTable.swapVarNames(pivotRow, pivotCol);
+        return pivotedTable;
     }
 }
 #endif
