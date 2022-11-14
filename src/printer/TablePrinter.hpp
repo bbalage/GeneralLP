@@ -18,7 +18,9 @@ public:
     virtual void printTable(const Table<T> &table) = 0;
     virtual void printNoSecondaryOptimum() = 0;
     virtual void printFirstToSecondStageTransfer() = 0;
-    virtual void printPrimaryOptimumData(const Table<T> &table) = 0;
+    virtual void printPrimaryOptimumData(const std::vector<VarNumAndVal<T>> &xs,
+                                         const std::vector<VarNumAndVal<T>> &vs,
+                                         T optimum) = 0;
 };
 
 template <class T>
@@ -66,13 +68,25 @@ public:
         m_out_stream << "Starting second stage.\n";
     }
 
-    virtual void printPrimaryOptimumData(const Table<T> &table)
+    void printPrimaryOptimumData(const std::vector<VarNumAndVal<T>> &xs,
+                                 const std::vector<VarNumAndVal<T>> &vs,
+                                 T optimum) override
     {
-        m_out_stream << table.at(table.rows() - 1, table.cols() - 1) << std::endl;
+        m_out_stream << "Optimum data is the following:\n";
+        for (size_t i = 0; i < xs.size(); ++i)
+            m_out_stream << "x" << xs[i].num + 1 << " = " << stringify(xs[i].val) << "\n";
+        for (size_t i = 0; i < vs.size(); ++i)
+            m_out_stream << "v" << vs[i].num + 1 << " = " << stringify(vs[i].val) << "\n";
+        m_out_stream << "Optimum = " << stringify(optimum) << "\n";
     }
 
 private:
     std::ostream &m_out_stream;
+
+    std::string stringify(T val)
+    {
+        return std::to_string(val);
+    }
 };
 
 #endif

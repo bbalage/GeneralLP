@@ -17,10 +17,11 @@ enum struct VarType
     OTHER
 };
 
-struct VarPos
+template <class T>
+struct VarNumAndVal
 {
-    size_t index;
-    bool isCol;
+    size_t num;
+    T val;
 };
 
 struct VarName
@@ -132,23 +133,6 @@ public:
 
     VarType varTypeAtRow(size_t i) const { return m_varNamesRow[i].type; }
     VarType varTypeAtCol(size_t i) const { return m_varNamesCol[i].type; }
-
-    std::vector<VarPos> &xsCol() { return varsOfTypeCol(VarType::X); }
-    std::vector<VarPos> &vsCol() { return varsOfTypeCol(VarType::V); }
-    std::vector<VarPos> &usCol() { return varsOfTypeCol(VarType::U); }
-    std::vector<VarPos> &ussCol() { return varsOfTypeCol(VarType::US); }
-    std::vector<VarPos> &xsRow() { return varsOfTypeRow(VarType::X); }
-    std::vector<VarPos> &vsRow() { return varsOfTypeRow(VarType::V); }
-    std::vector<VarPos> &usRow() { return varsOfTypeRow(VarType::U); }
-    std::vector<VarPos> &ussRow() { return varsOfTypeRow(VarType::US); }
-    const std::vector<VarPos> &xsCol() const { return varsOfTypeCol(VarType::X); }
-    const std::vector<VarPos> &vsCol() const { return varsOfTypeCol(VarType::V); }
-    const std::vector<VarPos> &usCol() const { return varsOfTypeCol(VarType::U); }
-    const std::vector<VarPos> &ussCol() const { return varsOfTypeCol(VarType::US); }
-    const std::vector<VarPos> &xsRow() const { return varsOfTypeRow(VarType::X); }
-    const std::vector<VarPos> &vsRow() const { return varsOfTypeRow(VarType::V); }
-    const std::vector<VarPos> &usRow() const { return varsOfTypeRow(VarType::U); }
-    const std::vector<VarPos> &ussRow() const { return varsOfTypeRow(VarType::US); }
 
     bool operator==(const Table<T> &table) const
     {

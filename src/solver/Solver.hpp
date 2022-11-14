@@ -51,7 +51,8 @@ public:
             table = glp::calcNext_StageTwo(table);
         }
         tablePrinter.printTable(table);
-        // tablePrinter.printPrimaryOptimumData(table);
+        auto [xVals, vVals, optimum] = glp::extractPrimaryOptimumData(table);
+        tablePrinter.printPrimaryOptimumData(xVals, vVals, optimum);
     }
 };
 

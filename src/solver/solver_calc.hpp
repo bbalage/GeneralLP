@@ -2,6 +2,7 @@
 #define GENERALLP_SOLVER_SOLVERCALC_HPP
 
 #include <limits>
+#include <algorithm>
 
 #include "../table/Table.hpp"
 #include "../util/exception.hpp"
@@ -188,6 +189,47 @@ namespace glp
         Table<T> pivotedTable = glp::pivot(table, pivotRow, pivotCol);
         pivotedTable.swapVarNames(pivotRow, pivotCol);
         return pivotedTable;
+    }
+
+    /**
+     * Extracts the values of X and V variables and the resulting optimum (z) value from the table.
+     *
+     * @param table A table, which already has the primary optimum calculated and the values are accordingly set.
+     * @return std::tuple which contains optimum data in the following order: x varnames and values, v varnames and values, optimum (z) value
+     */
+    template <class T>
+    std::tuple<std::vector<VarNumAndVal<T>>, std::vector<VarNumAndVal<T>>, T> extractPrimaryOptimumData(const Table<T> &table)
+    {
+        auto sortedVariableValueExtractor = [&table](VarType type) -> std::vector<VarNumAndVal<T>>
+        {
+            const auto &indicesRow = table.varsOfTypeRow(type);
+            std::vector<VarNumAndVal<T>> varNumsAndValues;
+            varNumsAndValues.reserve(indicesRow.size());
+            for (const auto &indexRow : indicesRow)
+            {
+                varNumsAndValues.push_back(VarNumAndVal<T>{
+                    table.varNamesRow().at(indexRow).num,
+                    table.at(indexRow, table.bColIndex())});
+            }
+            const auto &indicesCol = table.varsOfTypeCol(type);
+            for (const auto &indexCol : indicesCol)
+            {
+                varNumsAndValues.push_back(VarNumAndVal<T>{
+                    table.varNamesCol().at(indexCol).num, 0});
+            }
+            std::sort(
+                varNumsAndValues.begin(),
+                varNumsAndValues.end(),
+                [](const VarNumAndVal<T> &a, const VarNumAndVal<T> &b)
+                {
+                    return a.num < b.num;
+                });
+            return varNumsAndValues;
+        };
+        return std::make_tuple(
+            sortedVariableValueExtractor(VarType::X),
+            sortedVariableValueExtractor(VarType::V),
+            table.at(table.rows() - 1, table.cols() - 1) * -1);
     }
 }
 #endif
