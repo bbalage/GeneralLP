@@ -61,6 +61,9 @@ public:
                                                      m_varNamesRow{varNamesRow},
                                                      m_table{tableValues}
     {
+        static_assert(std::is_floating_point_v<T>);
+        // TODO: std::is_same_v<T, Fraction>
+        static_assert(std::is_move_assignable_v<T>);
     }
 
     Table(size_t rows,

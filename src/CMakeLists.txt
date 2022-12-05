@@ -13,5 +13,9 @@ set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 set(MAIN_EXECUTABLE_NAME ${CMAKE_PROJECT_NAME})
 add_executable(${MAIN_EXECUTABLE_NAME} "main.cpp")
 target_link_libraries(${MAIN_EXECUTABLE_NAME}
-    ${LIB_NAME}
-    ${OpenCV_LIBS})
+    ${LIB_NAME})
+
+set(TTY_MAIN_EXECUTABLE_NAME tty_glp)
+add_executable(${TTY_MAIN_EXECUTABLE_NAME} "tty_main.cpp")
+target_link_libraries(${TTY_MAIN_EXECUTABLE_NAME}
+    ${LIB_NAME})
